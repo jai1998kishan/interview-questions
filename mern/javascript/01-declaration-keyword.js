@@ -123,7 +123,11 @@ console.log(s); // "hello"
 /*
 
 How to Actually Freeze an Object
-If you want true immutability, use Object.freeze()
+    If you want true immutability, use Object.freeze()
+
+
+    ⚠️ Object.freeze is shallow
+    Nested objects are NOT frozen:
 
 */
 
@@ -134,3 +138,42 @@ person.city = "NYC"; // ❌ Silently fails
 delete person.name; // ❌ Silently fails
 
 console.log(person); // { name: "Alice", age: 25 }
+
+const config = Object.freeze({
+  theme: "dark",
+  colors: { primary: "blue" }, // nested object NOT frozen
+});
+
+config.theme = "light"; // ❌ Blocked
+config.colors.primary = "red"; // ✅ STILL WORKS! (nested)
+
+// Deep freeze (manual):
+function deepFreeze(obj) {
+  Object.freeze(obj);
+  Object.values(obj).forEach((value) => {
+    if (typeof value === "object" && value !== null) {
+      deepFreeze(value);
+    }
+  });
+  return obj;
+}
+
+const config = deepFreeze({
+  theme: "dark",
+  colors: { primary: "blue" },
+});
+
+config.colors.primary = "red"; // ❌ Now blocked
+
+/*
+
+const  →  locks the "pointer" (binding)
+          ┌──────────────┐
+x ──────► │  { ... }     │  ← contents freely mutable
+          └──────────────┘
+          
+x = newObj  ❌ blocked
+x.prop = v  ✅ allowed
+
+
+*/
