@@ -26,13 +26,13 @@ async function runTest(label, hashEndpoint) {
   }
 
   // While hashing is happening, ping /health 5 times
-  await new Promise((r) => setTimeout(r, 50)); // let hashing start
+  await new Promise((resolve) => setTimeout(resolve, 50)); // let hashing start
 
   const healthTimes = [];
   for (let i = 0; i < 5; i++) {
     const t = await timeRequest(`${BASE}/health`);
     healthTimes.push(t);
-    await new Promise((r) => setTimeout(r, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
   }
 
   await Promise.all(hashPromises);
